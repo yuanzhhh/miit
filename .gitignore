@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build
+dist
+types
+
+# Test
+coverage
+
+# IDE
+.idea
+.vscode
+*.sublime-workspace
+*.sublime-project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
