@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "path": "dist/rollup-boilerplate.es.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/rollup-boilerplate.cjs.js",
+      "limit": "10 KB"
+    }
+  ]
+}

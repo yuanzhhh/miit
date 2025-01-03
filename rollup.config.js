@@ -1,64 +1,57 @@
-import { defineConfig } from 'rollup';
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import json from '@rollup/plugin-json';
-import esbuild from 'rollup-plugin-esbuild';
-import dts from 'rollup-plugin-dts';
-import pkg from './package.json' with { type: 'json' };
+const { babel } = require('@rollup/plugin-babel')
+const commonjs = require('@rollup/plugin-commonjs')
+const { nodeResolve } = require('@rollup/plugin-node-resolve')
+const typescript = require('@rollup/plugin-typescript')
+const { visualizer } = require('rollup-plugin-visualizer')
+const { default: esbuild } = require('rollup-plugin-esbuild')
+const { default: dts } = require('rollup-plugin-dts')
 
-const input = 'src/index.ts';
-const external = Object.keys(pkg.dependencies || {});
+const isProduction = process.env.NODE_ENV === 'production'
+const extensions = ['.js', '.ts']
 
-const plugins = [
-  resolve({
-    preferBuiltins: true,
-    extensions: ['.ts', '.js', '.json'],
-  }),
-  commonjs(),
-  json(),
-  esbuild({
-    target: 'es2020',
-    minify: process.env.NODE_ENV === 'production',
-  }),
-];
-
-const output = {
-  banner: `/**
- * ${pkg.name} v${pkg.version}
- * ${pkg.homepage}
- * (c) ${new Date().getFullYear()} ${pkg.author.name}
- * @license ${pkg.license}
- */`,
-};
-
-export default defineConfig([
-  // ESM & CJS builds
+const config = [
   {
-    input,
-    external,
-    plugins,
+    input: 'src/index.ts',
     output: [
       {
-        ...output,
-        format: 'es',
-        file: pkg.module,
-        sourcemap: true,
+        file: 'dist/rollup-boilerplate.cjs.js',
+        format: 'cjs',
+        sourcemap: !isProduction
       },
       {
-        ...output,
-        format: 'cjs',
-        file: pkg.main,
-        sourcemap: true,
-      },
+        file: 'dist/rollup-boilerplate.es.js',
+        format: 'es',
+        sourcemap: !isProduction
+      }
     ],
+    plugins: [
+      nodeResolve({ extensions }),
+      commonjs(),
+      typescript(),
+      babel({
+        extensions,
+        babelHelpers: 'bundled',
+        include: ['src/**/*']
+      }),
+      esbuild({
+        minify: isProduction,
+        sourceMap: !isProduction,
+        target: 'es2015'
+      }),
+      visualizer({
+        filename: 'stats.html',
+        title: 'Rollup Visualizer'
+      })
+    ]
   },
-  // Types
   {
-    input,
+    input: 'src/index.ts',
     output: {
-      file: pkg.types,
-      format: 'es',
+      file: 'types/index.d.ts',
+      format: 'es'
     },
-    plugins: [dts()],
-  },
-]);
+    plugins: [dts()]
+  }
+]
+
+module.exports = config
