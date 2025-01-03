@@ -1,13 +1,13 @@
-const { babel } = require('@rollup/plugin-babel')
-const commonjs = require('@rollup/plugin-commonjs')
-const { nodeResolve } = require('@rollup/plugin-node-resolve')
-const typescript = require('@rollup/plugin-typescript')
-const { visualizer } = require('rollup-plugin-visualizer')
-const { default: esbuild } = require('rollup-plugin-esbuild')
-const { default: dts } = require('rollup-plugin-dts')
+const { babel } = require('@rollup/plugin-babel');
+const commonjs = require('@rollup/plugin-commonjs');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
+const typescript = require('@rollup/plugin-typescript');
+const { visualizer } = require('rollup-plugin-visualizer');
+const { default: esbuild } = require('rollup-plugin-esbuild');
+const { default: dts } = require('rollup-plugin-dts');
 
-const isProduction = process.env.NODE_ENV === 'production'
-const extensions = ['.js', '.ts']
+const isProduction = process.env.NODE_ENV === 'production';
+const extensions = ['.js', '.ts'];
 
 const config = [
   {
@@ -16,13 +16,13 @@ const config = [
       {
         file: 'dist/rollup-boilerplate.cjs.js',
         format: 'cjs',
-        sourcemap: !isProduction
+        sourcemap: !isProduction,
       },
       {
         file: 'dist/rollup-boilerplate.es.js',
         format: 'es',
-        sourcemap: !isProduction
-      }
+        sourcemap: !isProduction,
+      },
     ],
     plugins: [
       nodeResolve({ extensions }),
@@ -31,27 +31,27 @@ const config = [
       babel({
         extensions,
         babelHelpers: 'bundled',
-        include: ['src/**/*']
+        include: ['src/**/*'],
       }),
       esbuild({
         minify: isProduction,
         sourceMap: !isProduction,
-        target: 'es2015'
+        target: 'es2015',
       }),
       visualizer({
         filename: 'stats.html',
-        title: 'Rollup Visualizer'
-      })
-    ]
+        title: 'Rollup Visualizer',
+      }),
+    ],
   },
   {
     input: 'src/index.ts',
     output: {
       file: 'types/index.d.ts',
-      format: 'es'
+      format: 'es',
     },
-    plugins: [dts()]
-  }
-]
+    plugins: [dts()],
+  },
+];
 
-module.exports = config
+module.exports = config;
