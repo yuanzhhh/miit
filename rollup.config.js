@@ -14,12 +14,12 @@ const config = [
     input: 'src/index.ts',
     output: [
       {
-        file: 'dist/rollup-boilerplate.cjs.js',
+        file: 'dist/index.cjs.js',
         format: 'cjs',
         sourcemap: !isProduction,
       },
       {
-        file: 'dist/rollup-boilerplate.es.js',
+        file: 'dist/index.es.js',
         format: 'es',
         sourcemap: !isProduction,
       },
