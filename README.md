@@ -179,7 +179,6 @@ eventBus.destroy();
 | Feature                  | mitt       | miit      |
 | ------------------------ | ---------- | --------- |
 | **Basic Events**         | ✅         | ✅        |
-| **Tiny Size**            | ✅ (~200B) | ✅ (~3KB) |
 | **TypeScript**           | ✅         | ✅        |
 | **Event Caching**        | ❌         | ✅        |
 | **Never Miss Events**    | ❌         | ✅        |
