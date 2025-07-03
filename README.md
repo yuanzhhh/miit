@@ -39,7 +39,6 @@ eventBus.on('userLogin', (user) => {
 
 - 🎯 **Never miss events** - Intelligent caching with BehaviorSubject
 - 🔄 **100% mitt compatible** - Drop-in replacement, same API
-- 📦 **Tiny bundle size** - Only adds ~3KB gzipped
 - 🎨 **TypeScript first** - Full type safety out of the box
 - ⚡ **Zero learning curve** - If you know mitt, you know miit
 - 🔧 **Enhanced debugging** - Get current state anytime
