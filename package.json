@@ -1,6 +1,6 @@
 {
   "name": "miit",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Miit",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",

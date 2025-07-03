@@ -75,9 +75,9 @@ describe('EnhancedEventBus', () => {
 
     test('should receive events even when emitted before listening (core feature)', (done) => {
       const testData = { message: 'I was emitted first!' };
-      
+
       eventBus.emit('late-listener-event', testData);
-      
+
       eventBus.on('late-listener-event', (data) => {
         expect(data).toEqual(testData);
         done();
@@ -87,26 +87,26 @@ describe('EnhancedEventBus', () => {
     test('should handle multiple emit-then-on scenarios', () => {
       const handler1 = jest.fn();
       const handler2 = jest.fn();
-      
+
       eventBus.emit('event-a', 'data-a');
       eventBus.emit('event-b', 'data-b');
-      
+
       eventBus.on('event-a', handler1);
       eventBus.on('event-b', handler2);
-      
+
       expect(handler1).toHaveBeenCalledWith('data-a');
       expect(handler2).toHaveBeenCalledWith('data-b');
     });
 
     test('should get latest value when multiple emits happened before listening', () => {
       const handler = jest.fn();
-      
+
       eventBus.emit('sequence-event', 'first');
       eventBus.emit('sequence-event', 'second');
       eventBus.emit('sequence-event', 'third');
-      
+
       eventBus.on('sequence-event', handler);
-      
+
       expect(handler).toHaveBeenCalledWith('third');
       expect(handler).toHaveBeenCalledTimes(1);
     });
