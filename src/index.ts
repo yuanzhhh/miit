@@ -16,10 +16,7 @@ class EnhancedEventBus<Events extends Record<EventType, any> = Record<EventType,
   >();
   private subscriptions = new Map<string, SubscriptionManager[]>();
 
-  on = <Key extends keyof Events>(
-    type: Key, 
-    handler: Handler<Events[Key]>
-  ): (() => void) => {
+  on = <Key extends keyof Events>(type: Key, handler: Handler<Events[Key]>): (() => void) => {
     const eventName = String(type);
 
     const subscription: Subscription = this.getBehaviorSubject(type)
@@ -29,11 +26,11 @@ class EnhancedEventBus<Events extends Record<EventType, any> = Record<EventType,
     if (!this.subscriptions.has(eventName)) {
       this.subscriptions.set(eventName, []);
     }
-    
+
     const managers = this.subscriptions.get(eventName)!;
     const subscriptionManager: SubscriptionManager = {
       subscription,
-      handler
+      handler,
     };
     managers.push(subscriptionManager);
 
@@ -55,32 +52,31 @@ class EnhancedEventBus<Events extends Record<EventType, any> = Record<EventType,
     this.getBehaviorSubject(type).next(event);
   };
 
-  off = <Key extends keyof Events>(
-    type?: Key, 
-    handler?: Handler<Events[Key]>
-  ): void => {
+  off = <Key extends keyof Events>(type?: Key, handler?: Handler<Events[Key]>): void => {
     if (type === undefined) {
-      console.warn('off() called without parameters. Use clear() to remove all listeners and cached values, or specify event type to remove specific listeners.');
+      console.warn(
+        'off() called without parameters. Use clear() to remove all listeners and cached values, or specify event type to remove specific listeners.'
+      );
       return;
     }
 
     const eventName = String(type);
-    
+
     if (!this.subscriptions.has(eventName)) return;
-    
+
     const managers = this.subscriptions.get(eventName)!;
-    
+
     if (handler === undefined) {
       // 原有行为：移除所有 handlers
       managers.forEach(({ subscription }) => subscription.unsubscribe());
       this.subscriptions.delete(eventName);
     } else {
       // 新功能：移除特定 handler
-      const index = managers.findIndex(manager => manager.handler === handler);
+      const index = managers.findIndex((manager) => manager.handler === handler);
       if (index > -1) {
         managers[index].subscription.unsubscribe();
         managers.splice(index, 1);
-        
+
         // 如果没有更多 handlers，删除整个事件类型
         if (managers.length === 0) {
           this.subscriptions.delete(eventName);

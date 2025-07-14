@@ -209,14 +209,14 @@ eventBus.destroy();
 
 ## 🆚 miit vs mitt
 
-| Feature                  | mitt       | miit      |
-| ------------------------ | ---------- | --------- |
-| **Basic Events**         | ✅         | ✅        |
-| **TypeScript**           | ✅         | ✅        |
-| **Event Caching**        | ❌         | ✅        |
-| **Never Miss Events**    | ❌         | ✅        |
-| **Current State Access** | ❌         | ✅        |
-| **mitt API Compatible**  | ✅         | ✅        |
+| Feature                  | mitt | miit |
+| ------------------------ | ---- | ---- |
+| **Basic Events**         | ✅   | ✅   |
+| **TypeScript**           | ✅   | ✅   |
+| **Event Caching**        | ❌   | ✅   |
+| **Never Miss Events**    | ❌   | ✅   |
+| **Current State Access** | ❌   | ✅   |
+| **mitt API Compatible**  | ✅   | ✅   |
 
 ## 🎨 Usage Patterns
 
@@ -312,7 +312,7 @@ const unsubscribe3 = eventBus.on('update', (data) => console.log('Handler 3:', d
 unsubscribe2(); // Only Handler 2 is removed
 
 eventBus.emit('update', 'test');
-// Output: 
+// Output:
 // Handler 1: test
 // Handler 3: test
 ```
@@ -343,13 +343,13 @@ eventBus.emit('click', { x: 100, y: 200 });
 
 ### Comparison: When to Use Which Method
 
-| Scenario | Unsubscribe Function | `off(type, handler)` |
-|----------|---------------------|---------------------|
-| **React useEffect cleanup** | ✅ Perfect fit | ❌ Requires handler ref |
-| **Component unmounting** | ✅ Clean & direct | ✅ Works well |
-| **Conditional handler removal** | ✅ Store unsubscribe fn | ✅ Store handler ref |
-| **Bulk handler management** | ❌ Need multiple refs | ✅ Easy with handler refs |
-| **Anonymous functions** | ✅ Always works | ❌ Can't reference later |
+| Scenario                        | Unsubscribe Function    | `off(type, handler)`      |
+| ------------------------------- | ----------------------- | ------------------------- |
+| **React useEffect cleanup**     | ✅ Perfect fit          | ❌ Requires handler ref   |
+| **Component unmounting**        | ✅ Clean & direct       | ✅ Works well             |
+| **Conditional handler removal** | ✅ Store unsubscribe fn | ✅ Store handler ref      |
+| **Bulk handler management**     | ❌ Need multiple refs   | ✅ Easy with handler refs |
+| **Anonymous functions**         | ✅ Always works         | ❌ Can't reference later  |
 
 ### Real-World Examples
 
@@ -358,13 +358,13 @@ eventBus.emit('click', { x: 100, y: 200 });
 ```typescript
 function useGlobalState() {
   const [user, setUser] = useState(null);
-  
+
   useEffect(() => {
     // Method 1: Clean unsubscribe pattern
     const unsubscribe = globalEvents.on('userUpdate', setUser);
     return unsubscribe; // Perfect cleanup
   }, []);
-  
+
   return user;
 }
 ```
@@ -374,13 +374,13 @@ function useGlobalState() {
 ```typescript
 class NotificationManager {
   private handlers = new Map<string, Function>();
-  
+
   addHandler(id: string, handler: Function) {
     // Method 2: Store handler reference for later removal
     this.handlers.set(id, handler);
     eventBus.on('notification', handler);
   }
-  
+
   removeHandler(id: string) {
     const handler = this.handlers.get(id);
     if (handler) {

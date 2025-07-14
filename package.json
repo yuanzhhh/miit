@@ -41,7 +41,7 @@
     "dev": "pnpm install && cross-env NODE_ENV=development rollup -c -w",
     "cp-package": "cp ./package.json ./dist",
     "runAfterBuild": "node ./afterBuild.js",
-    "build": "pnpm install && pnpm format && pnpm lint && pnpm test && pnpm coverage && pnpm clean && cross-env NODE_ENV=production rollup -c && npm-run-all -s cp-package runAfterBuild",
+    "build": "rm -rf stats.html && pnpm install && pnpm format && pnpm lint && pnpm test && pnpm coverage && pnpm clean && cross-env NODE_ENV=production rollup -c && npm-run-all -s cp-package runAfterBuild",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.js",
