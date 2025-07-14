@@ -88,14 +88,25 @@ const eventBus = createEventBus<{
 }>();
 ```
 
-### `on<Key>(type, handler)`
+### `on<Key>(type, handler)` → `() => void`
 
 Listen to an event. If the event was previously emitted, the handler will be called immediately with the cached value.
 
+**🆕 Enhanced**: Now returns an unsubscribe function for precise handler removal.
+
 ```typescript
+// Basic usage
 eventBus.on('userLogin', (user) => {
   console.log('User logged in:', user);
 });
+
+// 🆕 Get unsubscribe function
+const unsubscribe = eventBus.on('userLogin', (user) => {
+  console.log('User logged in:', user);
+});
+
+// Remove this specific handler later
+unsubscribe();
 ```
 
 ### `emit<Key>(type, event)`
@@ -106,16 +117,28 @@ Emit an event. The event will be cached and delivered to current and future list
 eventBus.emit('userLogin', { id: 1, name: 'John' });
 ```
 
-### `off<Key>(type?)`
+### `off<Key>(type?, handler?)`
 
-Remove event listeners.
+Remove event listeners with enhanced precision control.
+
+**🆕 Enhanced**: Now supports removing specific handlers while maintaining backward compatibility.
 
 ```typescript
-// Remove all listeners for specific event
+// Remove all listeners for specific event (original behavior)
 eventBus.off('userLogin');
 
-// Remove all listeners for all events
-eventBus.off();
+// Use clear() instead to remove all listeners and cached values
+eventBus.clear(); // Actually removes all listeners and cached values
+
+// 🆕 Remove specific handler only
+const handler1 = (user) => console.log('Handler 1:', user);
+const handler2 = (user) => console.log('Handler 2:', user);
+
+eventBus.on('userLogin', handler1);
+eventBus.on('userLogin', handler2);
+
+// Remove only handler1, handler2 continues to work
+eventBus.off('userLogin', handler1);
 ```
 
 ### `once<Key>(type, handler)`
@@ -160,10 +183,20 @@ console.log(`${count} listeners for userLogin`);
 
 ### `clear()`
 
-Remove all listeners and clear all cached events.
+Remove all listeners and clear all cached events. This is the proper way to completely reset the event bus.
+
+**⚠️ Important**: Unlike `off()` without parameters (which only shows a warning), `clear()` actually removes everything:
+
+- All event listeners
+- All cached event values
+- Completes all BehaviorSubjects
 
 ```typescript
+// Complete cleanup - removes listeners AND cached values
 eventBus.clear();
+
+// After clear(), getCurrentValue() returns undefined
+const value = eventBus.getCurrentValue('userLogin'); // undefined
 ```
 
 ### `destroy()`
@@ -257,6 +290,105 @@ stateEvents.emit('settings', { theme: 'dark', language: 'en' });
 // Components can get current state immediately
 const currentUser = stateEvents.getCurrentValue('user');
 const currentSettings = stateEvents.getCurrentValue('settings');
+```
+
+## 🎛️ Advanced Handler Management
+
+miit provides two powerful ways to manage event handlers with precision:
+
+### Method 1: Unsubscribe Functions (Recommended)
+
+Every `on()` call returns an unsubscribe function for clean, direct handler removal:
+
+```typescript
+const eventBus = createEventBus<{ update: string }>();
+
+// Each handler gets its own unsubscribe function
+const unsubscribe1 = eventBus.on('update', (data) => console.log('Handler 1:', data));
+const unsubscribe2 = eventBus.on('update', (data) => console.log('Handler 2:', data));
+const unsubscribe3 = eventBus.on('update', (data) => console.log('Handler 3:', data));
+
+// Remove specific handlers independently
+unsubscribe2(); // Only Handler 2 is removed
+
+eventBus.emit('update', 'test');
+// Output: 
+// Handler 1: test
+// Handler 3: test
+```
+
+### Method 2: Precise `off()` with Handler Reference
+
+Pass the exact handler function to `off()` for targeted removal:
+
+```typescript
+const eventBus = createEventBus<{ click: { x: number; y: number } }>();
+
+// Define handlers as variables to reference later
+const logHandler = (pos) => console.log('Position:', pos);
+const trackHandler = (pos) => analytics.track('click', pos);
+const debugHandler = (pos) => console.debug('Debug click:', pos);
+
+// Register multiple handlers
+eventBus.on('click', logHandler);
+eventBus.on('click', trackHandler);
+eventBus.on('click', debugHandler);
+
+// Remove only the debug handler
+eventBus.off('click', debugHandler);
+
+eventBus.emit('click', { x: 100, y: 200 });
+// Only logHandler and trackHandler will execute
+```
+
+### Comparison: When to Use Which Method
+
+| Scenario | Unsubscribe Function | `off(type, handler)` |
+|----------|---------------------|---------------------|
+| **React useEffect cleanup** | ✅ Perfect fit | ❌ Requires handler ref |
+| **Component unmounting** | ✅ Clean & direct | ✅ Works well |
+| **Conditional handler removal** | ✅ Store unsubscribe fn | ✅ Store handler ref |
+| **Bulk handler management** | ❌ Need multiple refs | ✅ Easy with handler refs |
+| **Anonymous functions** | ✅ Always works | ❌ Can't reference later |
+
+### Real-World Examples
+
+#### React Hook Pattern
+
+```typescript
+function useGlobalState() {
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    // Method 1: Clean unsubscribe pattern
+    const unsubscribe = globalEvents.on('userUpdate', setUser);
+    return unsubscribe; // Perfect cleanup
+  }, []);
+  
+  return user;
+}
+```
+
+#### Dynamic Handler Management
+
+```typescript
+class NotificationManager {
+  private handlers = new Map<string, Function>();
+  
+  addHandler(id: string, handler: Function) {
+    // Method 2: Store handler reference for later removal
+    this.handlers.set(id, handler);
+    eventBus.on('notification', handler);
+  }
+  
+  removeHandler(id: string) {
+    const handler = this.handlers.get(id);
+    if (handler) {
+      eventBus.off('notification', handler);
+      this.handlers.delete(id);
+    }
+  }
+}
 ```
 
 ## 🔧 TypeScript Support

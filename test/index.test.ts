@@ -134,7 +134,7 @@ describe('EnhancedEventBus', () => {
       eventBus.on('event1', handler1);
       eventBus.on('event2', handler2);
 
-      eventBus.off(); // Clear all listeners
+      eventBus.clear(); // Use clear() instead of off() to clear all listeners
 
       eventBus.emit('event1', 'data1');
       eventBus.emit('event2', 'data2');
